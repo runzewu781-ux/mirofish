@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>深度交互 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .agent-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: var(--radius-md); cursor: pointer; transition: background 0.15s; }
+    .agent-item:hover { background: var(--surface-2); }
+    .agent-item.active { background: var(--surface-2); }
+    .agent-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--ink-muted); flex-shrink: 0; }
+    .agent-item.active .agent-avatar { background: var(--primary); color: #fff; }
+    .chat-bubble { padding: 10px 14px; border-radius: 12px; margin-bottom: 10px; max-width: 80%; font-size: 14px; line-height: 1.5; }
+    .chat-user { background: var(--primary); color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
+    .chat-agent { background: var(--surface-2); color: var(--ink-muted); border-bottom-left-radius: 4px; }
+    .empty-state { text-align: center; padding: 40px; color: var(--ink-subtle); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>System</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>仪表盘</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>新建项目</span></a>
+        <a href="history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>历史项目</span></a>
+        <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar"><div class="topbar-title">深度交互</div></header>
+      <div class="page-body">
+        <div id="loading" style="text-align:center;padding:60px;color:var(--ink-subtle)">加载中...</div>
+        <div id="error" style="display:none;text-align:center;padding:40px;color:var(--error)"></div>
+        <div id="content" style="display:none;height:calc(100vh - 120px);display:flex;gap:24px">
+          <div class="card" style="width:280px;flex-shrink:0;padding:16px;display:flex;flex-direction:column">
+            <h3 style="font-size:14px;margin-bottom:16px;color:var(--ink-muted)">智能体列表</h3>
+            <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px" id="agentList"></div>
+          </div>
+          <div class="card" style="flex:1;display:flex;flex-direction:column;padding:0;overflow:hidden">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--hairline)">
+              <div style="font-weight:600" id="chatTitle">--</div>
+              <div style="font-size:12px;color:var(--ink-subtle)" id="chatDesc">--</div>
+            </div>
+            <div style="flex:1;padding:20px;overflow-y:auto;background:var(--canvas)" id="chatBox">
+              <div class="empty-state">选择左侧智能体开始对话</div>
+            </div>
+            <div style="padding:16px 20px;border-top:1px solid var(--hairline);display:flex;gap:12px">
+              <input type="text" class="form-input" id="msgInput" placeholder="向该智能体提问...">
+              <button class="btn btn-primary" style="flex-shrink:0" id="sendBtn">发送</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.API_BASE || 'http://127.0.0.1:5001';
+    const params = new URLSearchParams(location.search);
+    const simId = params.get('simulation_id');
+    let agents = [];
+    let currentAgent = null;
+
+    async function init() {
+      if (!simId) { showError('缺少 simulation_id'); return; }
+      try {
+        const res = await fetch(`${API}/api/simulation/${simId}/profiles`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || '加载失败');
+        agents = data.data || [];
+        renderAgents();
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'flex';
+        if (agents.length) selectAgent(agents[0]);
+      } catch (err) { showError(err.message); }
+    }
+
+    function renderAgents() {
+      const box = document.getElementById('agentList');
+      if (!agents.length) { box.innerHTML = '<div class="empty-state">无智能体</div>'; return; }
+      box.innerHTML = agents.map((a, i) => {
+        const name = a.name || a.agent_name || `Agent_${i}`;
+        const desc = a.description || a.profile || a.persona || '';
+        const initial = name.charAt(0).toUpperCase();
+        return `<div class="agent-item" data-idx="${i}" onclick="selectAgentByIdx(${i})">
+          <div class="agent-avatar">${initial}</div>
+          <div>
+            <div style="font-size:13px;font-weight:500">${escapeHtml(name)}</div>
+            <div style="font-size:11px;color:var(--ink-subtle);white-space:nowrap;overflow:hidden;text-overflow:max-width:180px">${escapeHtml(desc.slice(0, 30))}${desc.length>30?'...':''}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    window.selectAgentByIdx = function(idx) {
+      selectAgent(agents[idx]);
+    };
+
+    function selectAgent(agent) {
+      currentAgent = agent;
+      const name = agent.name || agent.agent_name || '智能体';
+      document.getElementById('chatTitle').textContent = name;
+      document.getElementById('chatDesc').textContent = agent.description || agent.profile || agent.persona || '';
+      document.querySelectorAll('.agent-item').forEach((el, i) => {
+        el.classList.toggle('active', agents[i] === agent);
+      });
+      loadHistory(name);
+    }
+
+    async function loadHistory(agentName) {
+      const box = document.getElementById('chatBox');
+      box.innerHTML = '<div class="empty-state">加载历史中...</div>';
+      try {
+        const res = await fetch(`${API}/api/simulation/interview/history`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ simulation_id: simId, agent_name: agentName })
+        });
+        const data = await res.json();
+        box.innerHTML = '';
+        if (data.success && data.data?.length) {
+          data.data.forEach(m => addBubble(m.role === 'user' ? 'user' : 'agent', m.content));
+        } else {
+          box.innerHTML = '<div class="empty-state">开始对话吧</div>';
+        }
+      } catch (e) { box.innerHTML = '<div class="empty-state">加载失败</div>'; }
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('msgInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+
+    async function sendMessage() {
+      const input = document.getElementById('msgInput');
+      const msg = input.value.trim();
+      if (!msg || !currentAgent || !simId) return;
+      const name = currentAgent.name || currentAgent.agent_name || 'Agent';
+      addBubble('user', msg);
+      input.value = '';
+      try {
+        const res = await fetch(`${API}/api/simulation/interview`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ simulation_id: simId, agent_name: name, message: msg })
+        });
+        const data = await res.json();
+        if (data.success) addBubble('agent', data.data?.response || '...');
+        else addBubble('agent', '回复失败');
+      } catch (e) { addBubble('agent', '网络错误'); }
+    }
+
+    function addBubble(role, text) {
+      const box = document.getElementById('chatBox');
+      const empty = box.querySelector('.empty-state');
+      if (empty) empty.remove();
+      const div = document.createElement('div');
+      div.className = 'chat-bubble chat-' + role;
+      div.textContent = text;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function showError(msg) { document.getElementById('loading').style.display = 'none'; document.getElementById('error').style.display = 'block'; document.getElementById('error').textContent = msg; }
+    function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    init();
+  </script>
+</body>
+</html>

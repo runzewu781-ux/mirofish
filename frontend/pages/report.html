@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>研判报告 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .report-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .report-body h2 { font-size: 22px; margin-top: 28px; margin-bottom: 12px; color: var(--ink); }
+    .report-body h2:first-child { margin-top: 0; }
+    .report-body p { color: var(--ink-muted); line-height: 1.7; margin-bottom: 10px; }
+    .report-body ul { margin: 12px 0 12px 20px; color: var(--ink-muted); line-height: 1.8; }
+    .report-body li { margin-bottom: 6px; }
+    .chat-bar { display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--hairline); align-items: center; }
+    .chat-bar .form-input { flex: 1; }
+    .chat-history { max-height: 300px; overflow-y: auto; margin-bottom: 16px; }
+    .chat-bubble { padding: 10px 14px; border-radius: 12px; margin-bottom: 10px; max-width: 80%; font-size: 14px; line-height: 1.5; }
+    .chat-user { background: var(--primary); color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
+    .chat-agent { background: var(--surface-2); color: var(--ink-muted); border-bottom-left-radius: 4px; }
+    .loading { text-align: center; padding: 40px; color: var(--ink-subtle); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>System</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>仪表盘</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>新建项目</span></a>
+        <a href="history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>历史项目</span></a>
+        <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar"><div class="topbar-title">研判报告</div></header>
+      <div class="page-body">
+        <div class="report-header">
+          <div></div>
+          <div class="topbar-actions">
+            <button class="btn btn-primary" id="genBtn">生成报告</button>
+            <button class="btn btn-secondary" id="dlBtn" style="display:none">下载</button>
+          </div>
+        </div>
+
+        <div id="loading" style="text-align:center;padding:40px;color:var(--ink-subtle)">加载中...</div>
+        <div id="error" style="display:none;text-align:center;padding:40px;color:var(--error)"></div>
+
+        <div class="card report-body" id="reportBox" style="display:none">
+          <div id="reportContent"></div>
+        </div>
+
+        <div id="chatSection" style="display:none;margin-top:24px">
+          <h3 style="font-size:16px;margin-bottom:12px">与报告助手对话</h3>
+          <div class="chat-history" id="chatHistory"></div>
+          <div class="chat-bar">
+            <input type="text" class="form-input" id="chatInput" placeholder="询问报告内容...">
+            <button class="btn btn-primary" id="chatSend">发送</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.API_BASE || 'http://127.0.0.1:5001';
+    const params = new URLSearchParams(location.search);
+    const simId = params.get('simulation_id');
+    let reportId = null;
+    let chatHistory = [];
+
+    async function init() {
+      if (!simId) { showError('缺少 simulation_id'); return; }
+      try {
+        const res = await fetch(`${API}/api/simulation/${simId}/run-status`);
+        const data = await res.json();
+        if (data.success && data.data?.report_id) {
+          reportId = data.data.report_id;
+          await loadReport(reportId);
+        } else {
+          document.getElementById('loading').style.display = 'none';
+        }
+      } catch (err) { document.getElementById('loading').style.display = 'none'; }
+    }
+
+    async function loadReport(rid) {
+      try {
+        const res = await fetch(`${API}/api/report/${rid}`);
+        const data = await res.json();
+        if (data.success && data.data?.markdown_content) {
+          renderMarkdown(data.data.markdown_content);
+          document.getElementById('dlBtn').style.display = 'inline-flex';
+          document.getElementById('chatSection').style.display = 'block';
+        }
+      } catch (e) {}
+      document.getElementById('loading').style.display = 'none';
+    }
+
+    function renderMarkdown(md) {
+      const box = document.getElementById('reportBox');
+      const content = document.getElementById('reportContent');
+      let html = md
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/^- (.*$)/gim, '<li>$1</li>')
+        .replace(/\n\n/gim, '</p><p>')
+        .replace(/\n/gim, '<br>');
+      html = html.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
+      content.innerHTML = '<p>' + html + '</p>';
+      box.style.display = 'block';
+    }
+
+    document.getElementById('genBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('genBtn');
+      btn.disabled = true; btn.textContent = '生成中...';
+      try {
+        const res = await fetch(`${API}/api/report/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ simulation_id: simId }) });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || '生成失败');
+        const taskId = data.data.task_id;
+
+        const poll = setInterval(async () => {
+          try {
+            const s = await fetch(`${API}/api/report/generate/status`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ task_id: taskId }) });
+            const d = await s.json();
+            if (d.success && d.data?.status === 'completed') {
+              clearInterval(poll);
+              reportId = d.data.report_id;
+              await loadReport(reportId);
+              btn.textContent = '重新生成';
+              btn.disabled = false;
+            }
+            if (d.success && d.data?.status === 'failed') {
+              clearInterval(poll);
+              showError('生成失败: ' + (d.data.error || '未知错误'));
+              btn.textContent = '生成报告';
+              btn.disabled = false;
+            }
+          } catch (e) {}
+        }, 3000);
+      } catch (err) {
+        showError(err.message);
+        btn.textContent = '生成报告';
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById('dlBtn').addEventListener('click', () => {
+      if (!reportId) return;
+      window.open(`${API}/api/report/${reportId}/download`, '_blank');
+    });
+
+    document.getElementById('chatSend').addEventListener('click', sendChat);
+    document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendChat(); });
+
+    async function sendChat() {
+      const input = document.getElementById('chatInput');
+      const msg = input.value.trim();
+      if (!msg || !simId) return;
+      addChatBubble('user', msg);
+      input.value = '';
+      try {
+        const res = await fetch(`${API}/api/report/chat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ simulation_id: simId, message: msg, chat_history: chatHistory }) });
+        const data = await res.json();
+        if (data.success) {
+          addChatBubble('agent', data.data?.response || '...');
+          chatHistory.push({ role: 'user', content: msg }, { role: 'assistant', content: data.data?.response || '' });
+        }
+      } catch (e) { addChatBubble('agent', '请求失败'); }
+    }
+
+    function addChatBubble(role, text) {
+      const box = document.getElementById('chatHistory');
+      const div = document.createElement('div');
+      div.className = 'chat-bubble chat-' + role;
+      div.textContent = text;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function showError(msg) { document.getElementById('loading').style.display = 'none'; document.getElementById('error').style.display = 'block'; document.getElementById('error').textContent = msg; }
+    init();
+  </script>
+</body>
+</html>

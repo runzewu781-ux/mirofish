@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulation Config | Public Opinion Forecasting</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">POF <span>System</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="new-project.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span>New Project</span>
+        </a>
+        <a href="history.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>History</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">Simulation Config</div>
+      </header>
+      <div class="page-body">
+        <div class="card">
+          <h3 class="card-title">Entity Filter</h3>
+          <p class="card-text">Select which entity types to include in the simulation.</p>
+          <div class="checkbox-list">
+            <label class="checkbox-item">
+              <input type="checkbox" checked>
+              <span class="checkmark"></span>
+              <span class="checkbox-label">University</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" checked>
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Student</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" checked>
+              <span class="checkmark"></span>
+              <span class="checkbox-label">MediaOutlet</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" checked>
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Policy</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" checked>
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Government</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" checked>
+              <span class="checkmark"></span>
+              <span class="checkbox-label">SocialPlatform</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Platform Selection</h3>
+          <p class="card-text">Choose the social media platform for the simulation.</p>
+          <div class="platform-options">
+            <label class="platform-card selected">
+              <input type="radio" name="platform" value="twitter" checked>
+              <span class="platform-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </span>
+              <span class="platform-name">Twitter</span>
+            </label>
+            <label class="platform-card">
+              <input type="radio" name="platform" value="reddit">
+              <span class="platform-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+              </span>
+              <span class="platform-name">Reddit</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Simulation Requirement</h3>
+          <p class="card-text">Review the requirement used to generate this simulation.</p>
+          <textarea class="form-textarea" readonly rows="4">Simulate the public opinion evolution of a university policy revision incident. Include student protests, media coverage, government response, and social platform discussions. Run for 30 days with 200 active agents.</textarea>
+        </div>
+
+        <div class="page-actions">
+          <a href="sim-run.html" class="btn btn-primary">Create Simulation</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

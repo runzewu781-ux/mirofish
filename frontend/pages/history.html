@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>历史项目 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 1024px) { .project-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .project-grid { grid-template-columns: 1fr; } }
+    .project-card { display: flex; flex-direction: column; }
+    .project-card .card-title { font-size: 16px; font-weight: 600; }
+    .project-card .card-desc { font-size: 13px; color: var(--ink-muted); margin: 8px 0; flex: 1; }
+    .project-card .card-meta { font-size: 12px; color: var(--ink-tertiary); margin-bottom: 12px; }
+    .project-card .card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .empty-state { text-align: center; padding: 80px 20px; color: var(--ink-subtle); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>System</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>仪表盘</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>新建项目</span></a>
+        <a href="history.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>历史项目</span></a>
+        <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">历史项目</div>
+        <div class="topbar-actions">
+          <input type="text" id="searchInput" class="form-input" placeholder="搜索项目名称..." style="width:240px">
+        </div>
+      </header>
+      <div class="page-body">
+        <div class="project-grid" id="projectGrid">
+          <div class="empty-state">加载中...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.API_BASE || 'http://127.0.0.1:5001';
+    const STATUS_MAP = {
+      created: { label: '已创建', class: 'badge-default' },
+      ontology_generated: { label: '本体就绪', class: 'badge-info' },
+      graph_building: { label: '构建中', class: 'badge-warning' },
+      graph_completed: { label: '图谱就绪', class: 'badge-success' },
+      ready: { label: '准备就绪', class: 'badge-success' },
+      running: { label: '运行中', class: 'badge-info' },
+      completed: { label: '已完成', class: 'badge-success' },
+      stopped: { label: '已停止', class: 'badge-warning' },
+      failed: { label: '失败', class: 'badge-error' }
+    };
+
+    function getLink(p) {
+      const s = p.status;
+      if (s === 'created') return `new-project.html`;
+      if (s === 'ontology_generated') return `ontology.html?id=${p.project_id}`;
+      if (s === 'graph_building' || s === 'graph_completed' || s === 'failed') return `graph.html?id=${p.project_id}`;
+      return `sim-config.html?id=${p.project_id}`;
+    }
+
+    let allProjects = [];
+
+    async function load() {
+      try {
+        const res = await fetch(`${API}/api/graph/project/list?limit=50`);
+        const data = await res.json();
+        allProjects = data.success ? data.data : [];
+        render(allProjects);
+      } catch (err) {
+        document.getElementById('projectGrid').innerHTML = `<div class="empty-state">加载失败: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function render(list) {
+      const grid = document.getElementById('projectGrid');
+      if (!list.length) {
+        grid.innerHTML = '<div class="empty-state">暂无项目，<a href="new-project.html" class="link">去创建一个</a></div>';
+        return;
+      }
+      grid.innerHTML = list.map(p => {
+        const st = STATUS_MAP[p.status] || { label: p.status, class: 'badge-default' };
+        const date = p.created_at ? new Date(p.created_at).toLocaleDateString('zh-CN') : '-';
+        return `
+          <div class="card project-card">
+            <div class="flex justify-between items-center mb-2">
+              <div class="card-title">${escapeHtml(p.name || '未命名项目')}</div>
+              <span class="badge ${st.class}">${st.label}</span>
+            </div>
+            <div class="card-desc">${escapeHtml(p.simulation_requirement || '无描述')}</div>
+            <div class="card-meta">创建于 ${date} · ${p.total_text_length || 0} 字符</div>
+            <div class="card-footer">
+              <span class="text-subtle" style="font-size:12px">${(p.files || []).length} 个文件</span>
+              <a href="${getLink(p)}" class="btn btn-ghost" style="padding:4px 12px;font-size:13px">查看</a>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      render(q ? allProjects.filter(p => (p.name || '').toLowerCase().includes(q)) : allProjects);
+    });
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>新建项目 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .dropzone {
+      width: 100%;
+      border: 2px dashed var(--hairline);
+      border-radius: var(--radius-lg);
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--ink-subtle);
+      background: var(--surface-1);
+      transition: border-color 0.15s, background 0.15s;
+      cursor: pointer;
+      position: relative;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(37, 99, 235, 0.03);
+    }
+    .dropzone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .file-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--surface-2);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .file-item button {
+      background: none;
+      border: none;
+      color: var(--ink-subtle);
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+    .file-item button:hover {
+      color: var(--error);
+    }
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(250, 247, 242, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .loading-overlay.active {
+      display: flex;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--hairline);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-msg {
+      color: var(--error);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">POF <span>系统</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>仪表盘</span>
+        </a>
+        <a href="new-project.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span>新建项目</span>
+        </a>
+        <a href="history.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>历史项目</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>系统设置</span>
+        </a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">新建项目</div>
+      </header>
+      <div class="page-body">
+        <div class="card" style="max-width:720px">
+          <h2 style="margin-bottom:24px">创建新的预测项目</h2>
+
+          <div class="form-group">
+            <label class="form-label">项目名称</label>
+            <input type="text" id="projectName" class="form-input" placeholder="例如：高校政策舆情分析" maxlength="50">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">模拟需求</label>
+            <textarea id="simulationReq" class="form-textarea" placeholder="描述您希望模拟的场景。例如：如果该校严格执行新的管理规定，校园舆情将如何演变？"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">种子素材</label>
+            <div class="dropzone" id="dropzone">
+              <input type="file" id="fileInput" multiple accept=".pdf,.txt,.md,.markdown">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;opacity:0.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p style="margin-bottom:8px">拖拽文件到此处或点击上传</p>
+              <p class="text-tertiary">支持 PDF、TXT、MD</p>
+            </div>
+            <div class="file-list" id="fileList"></div>
+            <div class="error-msg" id="fileError"></div>
+          </div>
+
+          <div class="flex gap-3" style="margin-top:8px">
+            <button class="btn btn-primary" id="submitBtn">创建项目</button>
+            <a href="dashboard.html" class="btn btn-secondary">取消</a>
+          </div>
+          <div class="error-msg" id="formError"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <p style="color:var(--ink-muted);font-size:14px">AI 正在分析素材，提取实体与关系...</p>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const dropzone = document.getElementById('dropzone');
+    const fileList = document.getElementById('fileList');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const formError = document.getElementById('formError');
+    const fileError = document.getElementById('fileError');
+
+    let files = [];
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function renderFiles() {
+      fileList.innerHTML = '';
+      files.forEach((f, i) => {
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        div.innerHTML = `<span>${f.name} · ${formatSize(f.size)}</span><button onclick="removeFile(${i})" title="移除">×</button>`;
+        fileList.appendChild(div);
+      });
+    }
+
+    window.removeFile = function(idx) {
+      files.splice(idx, 1);
+      renderFiles();
+    };
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      const dropped = Array.from(e.dataTransfer.files);
+      files = files.concat(dropped);
+      renderFiles();
+    });
+
+    fileInput.addEventListener('change', () => {
+      files = files.concat(Array.from(fileInput.files));
+      renderFiles();
+      fileInput.value = '';
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      formError.textContent = '';
+      fileError.textContent = '';
+
+      const name = document.getElementById('projectName').value.trim();
+      const req = document.getElementById('simulationReq').value.trim();
+
+      if (!name) {
+        formError.textContent = '请输入项目名称。';
+        return;
+      }
+      if (!req) {
+        formError.textContent = '请描述模拟需求。';
+        return;
+      }
+      if (files.length === 0) {
+        fileError.textContent = '请至少上传一个文件（PDF、TXT 或 MD）。';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('project_name', name);
+      formData.append('simulation_requirement', req);
+      files.forEach(f => formData.append('files', f));
+
+      loadingOverlay.classList.add('active');
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('http://127.0.0.1:5001/api/graph/ontology/generate', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          window.location.href = `./ontology.html?id=${data.data.project_id}`;
+        } else {
+          formError.textContent = data.error || '请求失败。';
+          loadingOverlay.classList.remove('active');
+          submitBtn.disabled = false;
+        }
+      } catch (err) {
+        formError.textContent = '网络错误：' + err.message;
+        loadingOverlay.classList.remove('active');
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

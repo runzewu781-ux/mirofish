@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>仪表盘 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>系统</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>仪表盘</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>新建项目</span></a>
+        <a href="history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>历史项目</span></a>
+        <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>系统设置</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">仪表盘</div>
+        <div class="topbar-actions">
+          <a href="new-project.html" class="btn btn-primary">+ 新建项目</a>
+        </div>
+      </header>
+      <div class="page-body" id="app">
+        <div class="grid grid-3 mb-6">
+          <div class="card card-hover">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+            <div class="kpi-value" id="kpiActive">0</div>
+            <div class="kpi-label">活跃项目</div>
+          </div>
+          <div class="card card-hover">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div class="kpi-value" id="kpiCompleted">0</div>
+            <div class="kpi-label">已完成模拟</div>
+          </div>
+          <div class="card card-hover">
+            <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <div class="kpi-value" id="kpiAgents">0</div>
+            <div class="kpi-label">智能体总数</div>
+          </div>
+        </div>
+
+        <h2>最近项目</h2>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>项目名称</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
+              <tbody id="projectTable"><tr><td colspan="4" style="text-align:center;color:var(--ink-subtle)">加载中...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.API_BASE || 'http://127.0.0.1:5001';
+
+    const STATUS_MAP = {
+      created: { label: '已创建', class: 'badge-default' },
+      ontology_generated: { label: '本体就绪', class: 'badge-info' },
+      graph_building: { label: '构建图谱中', class: 'badge-warning' },
+      graph_completed: { label: '图谱就绪', class: 'badge-success' },
+      ready: { label: '就绪', class: 'badge-success' },
+      running: { label: '运行中', class: 'badge-info' },
+      completed: { label: '已完成', class: 'badge-success' },
+      stopped: { label: '已停止', class: 'badge-warning' },
+      failed: { label: '失败', class: 'badge-error' }
+    };
+
+    function getProjectLink(project) {
+      const s = project.status;
+      if (s === 'created') return `new-project.html`;
+      if (s === 'ontology_generated') return `ontology.html?id=${project.project_id}`;
+      if (s === 'graph_building' || s === 'graph_completed' || s === 'failed') return `graph.html?id=${project.project_id}`;
+      return `sim-config.html?id=${project.project_id}`;
+    }
+
+    async function load() {
+      try {
+        const [projectsRes, simRes] = await Promise.all([
+          fetch(`${API}/api/graph/project/list?limit=10`),
+          fetch(`${API}/api/simulation/history?limit=50`).catch(() => ({ json: async () => ({ success: false }) }))
+        ]);
+        const projectsData = await projectsRes.json();
+        const simData = await simRes.json();
+
+        const projects = projectsData.success ? projectsData.data : [];
+        const simulations = simData.success ? simData.data : [];
+
+        document.getElementById('kpiActive').textContent = projects.filter(p =>
+          ['created','ontology_generated','graph_building'].includes(p.status)
+        ).length;
+        document.getElementById('kpiCompleted').textContent = simulations.filter(s =>
+          s.status === 'completed'
+        ).length;
+        document.getElementById('kpiAgents').textContent = simulations.reduce((sum, s) =>
+          sum + (s.agent_count || 0), 0
+        );
+
+        const tbody = document.getElementById('projectTable');
+        if (!projects.length) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--ink-subtle)">暂无项目。<a href="new-project.html" class="link">创建一个</a>。</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = projects.map(p => {
+          const st = STATUS_MAP[p.status] || { label: p.status, class: 'badge-default' };
+          const date = p.created_at ? new Date(p.created_at).toLocaleDateString() : '-';
+          return `<tr>
+            <td>${escapeHtml(p.name || '未命名')}</td>
+            <td><span class="badge ${st.class}">${st.label}</span></td>
+            <td>${date}</td>
+            <td><a href="${getProjectLink(p)}" class="link">打开</a></td>
+          </tr>`;
+        }).join('');
+      } catch (err) {
+        document.getElementById('projectTable').innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--error)">错误：${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    load();
+  </script>
+</body>
+</html>

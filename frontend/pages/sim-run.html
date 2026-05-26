@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>模拟运行 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .status-bar { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+    .status-label { font-size: 14px; font-weight: 500; color: var(--ink-muted); white-space: nowrap; }
+    .status-label span { color: var(--ink); font-weight: 600; }
+    .terminal { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: var(--radius-md); padding: 16px; font-family: ui-monospace, SF Mono, Menlo, monospace; font-size: 13px; line-height: 1.7; max-height: 320px; overflow-y: auto; }
+    .terminal-line { color: var(--ink-muted); }
+    .terminal-line .ts { color: var(--ink-tertiary); margin-right: 8px; }
+    .terminal-line .agent { color: var(--primary-hover); font-weight: 600; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 4px; height: 140px; padding: 16px 0; }
+    .chart-bar { flex: 1; background: var(--primary); border-radius: var(--radius-xs) var(--radius-xs) 0 0; opacity: 0.8; min-width: 4px; }
+    .control-bar { display: flex; gap: 12px; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--hairline); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .empty-state { text-align: center; padding: 40px; color: var(--ink-subtle); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>System</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>仪表盘</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>新建项目</span></a>
+        <a href="history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>历史项目</span></a>
+        <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar"><div class="topbar-title">模拟运行</div></header>
+      <div class="page-body">
+        <div id="loading" style="text-align:center;padding:60px;color:var(--ink-subtle)">加载中...</div>
+        <div id="error" style="display:none;text-align:center;padding:40px;color:var(--error)"></div>
+        <div id="content" style="display:none">
+          <div class="status-bar">
+            <div class="status-label">轮次 <span id="roundCurrent">0</span> / <span id="roundTotal">0</span></div>
+            <div class="progress-bar w-full"><div class="progress-fill" id="roundProgress" style="width:0%"></div></div>
+          </div>
+
+          <div class="tabs mb-4">
+            <button class="tab active" data-tab="running">运行中</button>
+            <button class="tab" data-tab="logs">日志</button>
+            <button class="tab" data-tab="timeline">趋势</button>
+          </div>
+
+          <div class="tab-content active" id="tab-running">
+            <div class="grid grid-2 mb-4">
+              <div class="card">
+                <h3 class="mb-4">智能体行为</h3>
+                <div class="terminal" id="actionBox"><div class="empty-state">暂无行为记录</div></div>
+              </div>
+              <div class="card">
+                <h3 class="mb-4">情感趋势</h3>
+                <div class="chart-bars" id="sentimentChart"><div class="empty-state" style="height:100%;display:flex;align-items:center;justify-content:center">暂无数据</div></div>
+              </div>
+            </div>
+            <div class="card mb-4">
+              <h3 class="mb-4">最近帖子</h3>
+              <div class="table-wrap">
+                <table><thead><tr><th>智能体</th><th>平台</th><th>内容</th><th>时间</th></tr></thead>
+                <tbody id="postsTable"><tr><td colspan="4" style="text-align:center;color:var(--ink-subtle)">暂无帖子</td></tr></tbody>
+              </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-logs">
+            <div class="card"><div class="terminal" id="logBox"><div class="empty-state">暂无日志</div></div></div>
+          </div>
+
+          <div class="tab-content" id="tab-timeline">
+            <div class="card">
+              <h3 class="mb-4">情感时间线</h3>
+              <div class="chart-bars" id="timelineChart" style="height:200px"><div class="empty-state" style="height:100%;display:flex;align-items:center;justify-content:center">暂无数据</div></div>
+            </div>
+          </div>
+
+          <div class="control-bar">
+            <button class="btn btn-primary" id="startBtn">开始</button>
+            <button class="btn btn-secondary" id="pauseBtn" style="display:none">暂停</button>
+            <button class="btn btn-ghost" id="stopBtn">停止</button>
+            <a href="report.html" class="btn btn-primary" id="reportBtn" style="display:none;margin-left:auto">生成报告</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.API_BASE || 'http://127.0.0.1:5001';
+    const params = new URLSearchParams(location.search);
+    const simId = params.get('simulation_id');
+    let pollTimer = null;
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+      });
+    });
+
+    async function init() {
+      if (!simId) { showError('缺少 simulation_id'); return; }
+      try {
+        const res = await fetch(`${API}/api/simulation/${simId}/run-status`);
+        const data = await res.json();
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        if (data.success) updateUI(data.data);
+        startPolling();
+      } catch (err) { showError(err.message); }
+    }
+
+    function startPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(async () => {
+        try {
+          const res = await fetch(`${API}/api/simulation/${simId}/run-status`);
+          const data = await res.json();
+          if (data.success) updateUI(data.data);
+        } catch (e) {}
+      }, 3000);
+    }
+
+    function updateUI(data) {
+      const status = data.status || 'ready';
+      const current = data.current_round || 0;
+      const total = data.total_rounds || 0;
+      document.getElementById('roundCurrent').textContent = current;
+      document.getElementById('roundTotal').textContent = total;
+      document.getElementById('roundProgress').style.width = total ? (current / total * 100) + '%' : '0%';
+
+      if (status === 'running') {
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('pauseBtn').style.display = 'inline-flex';
+      } else if (status === 'completed' || status === 'stopped') {
+        document.getElementById('startBtn').style.display = 'none';
+        document.getElementById('pauseBtn').style.display = 'none';
+        document.getElementById('reportBtn').style.display = 'inline-flex';
+        if (pollTimer) clearInterval(pollTimer);
+      } else {
+        document.getElementById('startBtn').style.display = 'inline-flex';
+        document.getElementById('pauseBtn').style.display = 'none';
+      }
+
+      if (data.actions) renderActions(data.actions);
+      if (data.posts) renderPosts(data.posts);
+      if (data.timeline) renderTimeline(data.timeline);
+    }
+
+    function renderActions(actions) {
+      const box = document.getElementById('actionBox');
+      if (!actions.length) return;
+      box.innerHTML = actions.slice(-20).map(a =>
+        `<div class="terminal-line"><span class="ts">${a.time || '--:--:--'}</span><span class="agent">${escapeHtml(a.agent || 'Agent')}</span> ${escapeHtml(a.action || '')}</div>`
+      ).join('');
+    }
+
+    function renderPosts(posts) {
+      const tbody = document.getElementById('postsTable');
+      if (!posts.length) return;
+      tbody.innerHTML = posts.slice(0, 5).map(p =>
+        `<tr><td>${escapeHtml(p.agent || '-')}</td><td>${escapeHtml(p.platform || '-')}</td><td>${escapeHtml(p.content || '').slice(0, 60)}${p.content?.length > 60 ? '...' : ''}</td><td>${escapeHtml(p.time || '-')}</td></tr>`
+      ).join('');
+    }
+
+    function renderTimeline(timeline) {
+      const chart = document.getElementById('sentimentChart');
+      const tChart = document.getElementById('timelineChart');
+      if (!timeline.length) return;
+      const max = Math.max(...timeline.map(t => Math.max(t.positive || 0, t.neutral || 0, t.negative || 0)), 1);
+      const bars = timeline.slice(-15).map(t => {
+        const h = max ? ((t.negative || 0) / max * 100) : 0;
+        return `<div class="chart-bar" style="height:${h}%;background:var(--error);opacity:0.6" title="负面 ${t.negative}"></div>`;
+      }).join('');
+      chart.innerHTML = bars;
+      tChart.innerHTML = bars;
+    }
+
+    document.getElementById('startBtn').addEventListener('click', async () => {
+      try {
+        await fetch(`${API}/api/simulation/start`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ simulation_id: simId, rounds: 40 }) });
+        startPolling();
+      } catch (e) { alert('启动失败: ' + e.message); }
+    });
+
+    document.getElementById('pauseBtn').addEventListener('click', async () => {
+      try {
+        await fetch(`${API}/api/simulation/stop`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ simulation_id: simId }) });
+      } catch (e) {}
+    });
+
+    document.getElementById('stopBtn').addEventListener('click', async () => {
+      try {
+        await fetch(`${API}/api/simulation/stop`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ simulation_id: simId }) });
+        if (pollTimer) clearInterval(pollTimer);
+      } catch (e) {}
+    });
+
+    function showError(msg) { document.getElementById('loading').style.display = 'none'; document.getElementById('error').style.display = 'block'; document.getElementById('error').textContent = msg; }
+    function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    init();
+  </script>
+</body>
+</html>

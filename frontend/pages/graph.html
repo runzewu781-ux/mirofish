@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>图谱构建 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .progress-section { margin-bottom: 24px; }
+    .progress-label { font-size: 14px; color: var(--ink-muted); margin-top: 8px; }
+    .step-indicator { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .step { display: flex; align-items: center; gap: 8px; }
+    .step-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--surface-3); color: var(--ink-subtle); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+    .step.active .step-circle { background: var(--primary); color: #fff; }
+    .step.completed .step-circle { background: var(--success); color: #fff; }
+    .step-label { font-size: 13px; color: var(--ink-subtle); }
+    .step.active .step-label { color: var(--ink); font-weight: 500; }
+    .step-connector { width: 24px; height: 2px; background: var(--hairline); }
+    .terminal-log { background: var(--surface-1); border: 1px solid var(--hairline); border-radius: var(--radius-lg); padding: 16px; font-family: ui-monospace, SF Mono, Menlo, monospace; font-size: 13px; line-height: 1.6; max-height: 400px; overflow-y: auto; }
+    .log-line { color: var(--ink-muted); }
+    .log-time { color: var(--ink-tertiary); margin-right: 4px; }
+    .log-info { color: var(--primary); }
+    .log-warn { color: var(--warning); }
+    .log-error { color: var(--error); }
+    .page-actions { margin-top: 24px; display: flex; gap: 12px; align-items: center; }
+    .loading { text-align: center; padding: 60px 20px; color: var(--ink-subtle); }
+    .error { text-align: center; padding: 40px 20px; color: var(--error); }
+    .success-box { background: rgba(5,150,105,0.08); border: 1px solid rgba(5,150,105,0.2); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>系统</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>仪表盘</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>新建项目</span></a>
+        <a href="history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>历史项目</span></a>
+        <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>系统设置</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar"><div class="topbar-title">图谱构建</div></header>
+      <div class="page-body" id="app">
+        <div class="loading" id="loading">加载中...</div>
+        <div class="error" id="error" style="display:none"></div>
+        <div id="content" style="display:none">
+          <div class="progress-section">
+            <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+            <div class="progress-label" id="progressLabel">0% — 初始化中...</div>
+          </div>
+
+          <div class="step-indicator" id="stepIndicator">
+            <div class="step" id="step1"><div class="step-circle">1</div><div class="step-label">文本分块</div></div>
+            <div class="step-connector"></div>
+            <div class="step" id="step2"><div class="step-circle">2</div><div class="step-label">创建图谱</div></div>
+            <div class="step-connector"></div>
+            <div class="step" id="step3"><div class="step-circle">3</div><div class="step-label">设置本体</div></div>
+            <div class="step-connector"></div>
+            <div class="step" id="step4"><div class="step-circle">4</div><div class="step-label">添加文本</div></div>
+          </div>
+
+          <div class="terminal-log" id="logBox"><div class="log-line" id="emptyLog">等待开始...</div></div>
+
+          <div class="page-actions" id="actions">
+            <button class="btn btn-secondary" id="viewDataBtn" style="display:none">查看图谱数据</button>
+            <a href="sim-config.html" class="btn btn-primary" id="nextBtn" style="display:none">进入模拟配置</a>
+            <button class="btn btn-primary" id="retryBtn" style="display:none" onclick="startBuild()">重试构建</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.API_BASE || 'http://127.0.0.1:5001';
+    const params = new URLSearchParams(location.search);
+    const projectId = params.get('id');
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const content = document.getElementById('content');
+    const progressBar = document.getElementById('progressBar');
+    const progressLabel = document.getElementById('progressLabel');
+    const logBox = document.getElementById('logBox');
+    const viewDataBtn = document.getElementById('viewDataBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const retryBtn = document.getElementById('retryBtn');
+
+    let pollTimer = null;
+
+    if (!projectId) {
+      loading.style.display = 'none';
+      error.style.display = 'block';
+      error.textContent = '缺少项目 ID。';
+    } else {
+      init();
+    }
+
+    async function init() {
+      try {
+        const res = await fetch(`${API}/api/graph/project/${projectId}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || '加载项目失败');
+        const project = data.data;
+
+        loading.style.display = 'none';
+        content.style.display = 'block';
+
+        if (project.status === 'created') {
+          addLog('error', '项目本体尚未生成。');
+          retryBtn.style.display = 'inline-flex';
+          return;
+        }
+
+        if (project.status === 'ontology_generated') {
+          addLog('info', '本体就绪。开始构建图谱...');
+          await startBuild();
+          return;
+        }
+
+        if (project.status === 'graph_building') {
+          addLog('info', '图谱构建进行中。恢复进度...');
+          startPolling(project.graph_build_task_id);
+          return;
+        }
+
+        if (project.status === 'graph_completed') {
+          showCompleted(project);
+          return;
+        }
+
+        if (project.status === 'failed') {
+          addLog('error', '构建失败：' + (project.error || '未知错误'));
+          retryBtn.style.display = 'inline-flex';
+          return;
+        }
+      } catch (err) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        error.textContent = err.message;
+      }
+    }
+
+    async function startBuild() {
+      retryBtn.style.display = 'none';
+      try {
+        const res = await fetch(`${API}/api/graph/build`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_id: projectId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          addLog('info', '构建任务已启动：' + data.data.task_id);
+          startPolling(data.data.task_id);
+        } else {
+          throw new Error(data.error || '构建启动失败');
+        }
+      } catch (err) {
+        addLog('error', err.message);
+        retryBtn.style.display = 'inline-flex';
+      }
+    }
+
+    function startPolling(taskId) {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(async () => {
+        try {
+          const res = await fetch(`${API}/api/graph/task/${taskId}`);
+          const data = await res.json();
+          if (!data.success) return;
+          const task = data.data;
+          updateUI(task);
+
+          if (task.status === 'completed') {
+            clearInterval(pollTimer);
+            showCompleted(null);
+          }
+          if (task.status === 'failed') {
+            clearInterval(pollTimer);
+            addLog('error', '构建失败：' + (task.message || task.error || '未知错误'));
+            retryBtn.style.display = 'inline-flex';
+          }
+        } catch (e) {}
+      }, 2000);
+    }
+
+    function updateUI(task) {
+      const progress = task.progress || 0;
+      progressBar.style.width = progress + '%';
+      progressLabel.textContent = `${progress}% — ${task.message || '处理中...'}`;
+
+      if (task.message) addLog('info', task.message);
+
+      updateSteps(progress);
+    }
+
+    function updateSteps(progress) {
+      const setStep = (id, cls) => {
+        const el = document.getElementById(id);
+        el.className = 'step ' + cls;
+      };
+      if (progress >= 100) { setStep('step1','completed'); setStep('step2','completed'); setStep('step3','completed'); setStep('step4','completed'); }
+      else if (progress >= 55) { setStep('step1','completed'); setStep('step2','completed'); setStep('step3','completed'); setStep('step4','active'); }
+      else if (progress >= 15) { setStep('step1','completed'); setStep('step2','completed'); setStep('step3','active'); setStep('step4',''); }
+      else if (progress >= 5) { setStep('step1','completed'); setStep('step2','active'); setStep('step3',''); setStep('step4',''); }
+      else if (progress > 0) { setStep('step1','active'); setStep('step2',''); setStep('step3',''); setStep('step4',''); }
+    }
+
+    function addLog(level, msg) {
+      const empty = document.getElementById('emptyLog');
+      if (empty) empty.remove();
+      const div = document.createElement('div');
+      div.className = 'log-line';
+      const time = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      div.innerHTML = `<span class="log-time">${time}</span> <span class="log-${level}">[${level.toUpperCase()}]</span> ${escapeHtml(msg)}`;
+      logBox.appendChild(div);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function showCompleted(project) {
+      progressBar.style.width = '100%';
+      progressLabel.textContent = '100% — 图谱构建完成';
+      updateSteps(100);
+      addLog('info', '图谱构建成功。');
+      viewDataBtn.style.display = 'inline-flex';
+      nextBtn.style.display = 'inline-flex';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

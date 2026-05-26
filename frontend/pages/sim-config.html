@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>模拟配置 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .checkbox-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .checkbox-item { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--ink-muted); }
+    .checkbox-item input { width: 18px; height: 18px; accent-color: var(--primary); }
+    .platform-options { display: flex; gap: 16px; margin-top: 12px; }
+    .platform-card { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px 32px; border: 2px solid var(--hairline); border-radius: var(--radius-lg); cursor: pointer; transition: all 0.15s; background: var(--surface-1); }
+    .platform-card:hover { border-color: var(--hairline-strong); }
+    .platform-card.selected { border-color: var(--primary); background: rgba(37,99,235,0.04); }
+    .platform-card input { display: none; }
+    .platform-icon { width: 32px; height: 32px; color: var(--ink-muted); }
+    .platform-card.selected .platform-icon { color: var(--primary); }
+    .platform-name { font-size: 14px; font-weight: 500; color: var(--ink-muted); }
+    .platform-card.selected .platform-name { color: var(--ink); }
+    .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(250,247,242,0.85); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+    .loading-overlay.active { display: flex; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--hairline); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>System</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>仪表盘</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>新建项目</span></a>
+        <a href="history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>历史项目</span></a>
+        <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar"><div class="topbar-title">模拟配置</div></header>
+      <div class="page-body" id="app">
+        <div id="loading" style="text-align:center;padding:60px;color:var(--ink-subtle)">加载中...</div>
+        <div id="error" style="display:none;text-align:center;padding:40px;color:var(--error)"></div>
+        <div id="content" style="display:none">
+          <div class="card">
+            <h3 style="font-size:16px;font-weight:600;margin-bottom:12px">实体筛选</h3>
+            <p style="font-size:13px;color:var(--ink-muted);margin-bottom:12px">选择参与模拟的实体类型</p>
+            <div class="checkbox-list" id="entityList">加载中...</div>
+          </div>
+
+          <div class="card" style="margin-top:16px">
+            <h3 style="font-size:16px;font-weight:600;margin-bottom:12px">平台选择</h3>
+            <p style="font-size:13px;color:var(--ink-muted);margin-bottom:12px">选择模拟运行的社交媒体平台</p>
+            <div class="platform-options">
+              <label class="platform-card selected" id="platTwitter">
+                <input type="radio" name="platform" value="twitter" checked>
+                <span class="platform-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span>
+                <span class="platform-name">Twitter</span>
+              </label>
+              <label class="platform-card" id="platReddit">
+                <input type="radio" name="platform" value="reddit">
+                <span class="platform-icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg></span>
+                <span class="platform-name">Reddit</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:16px">
+            <h3 style="font-size:16px;font-weight:600;margin-bottom:12px">模拟需求</h3>
+            <textarea class="form-textarea" id="reqBox" readonly rows="4"></textarea>
+          </div>
+
+          <div style="margin-top:16px;display:flex;gap:12px">
+            <button class="btn btn-primary" id="createBtn">创建模拟</button>
+            <a href="graph.html?id=" id="backLink" class="btn btn-secondary">返回</a>
+          </div>
+          <div id="formError" style="color:var(--error);font-size:13px;margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <p style="color:var(--ink-muted);font-size:14px">正在准备模拟环境...</p>
+  </div>
+
+  <script>
+    const API = window.API_BASE || 'http://127.0.0.1:5001';
+    const params = new URLSearchParams(location.search);
+    const projectId = params.get('id');
+    let graphId = null;
+
+    document.querySelectorAll('input[name="platform"]').forEach(r => {
+      r.addEventListener('change', () => {
+        document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('selected'));
+        r.closest('.platform-card').classList.add('selected');
+      });
+    });
+
+    async function init() {
+      if (!projectId) { showError('缺少项目 ID'); return; }
+      document.getElementById('backLink').href = `graph.html?id=${projectId}`;
+      try {
+        const res = await fetch(`${API}/api/graph/project/${projectId}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+        const p = data.data;
+        graphId = p.graph_id;
+        document.getElementById('reqBox').value = p.simulation_requirement || '无描述';
+
+        if (!graphId) {
+          showError('图谱尚未构建完成，请先构建图谱');
+          return;
+        }
+        await loadEntities(graphId);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      } catch (err) { showError(err.message); }
+    }
+
+    async function loadEntities(gid) {
+      try {
+        const res = await fetch(`${API}/api/simulation/entities/${gid}`);
+        const data = await res.json();
+        const list = document.getElementById('entityList');
+        if (!data.success || !data.data?.length) {
+          list.innerHTML = '<div style="color:var(--ink-subtle)">未获取到实体列表</div>';
+          return;
+        }
+        list.innerHTML = data.data.map(e =>
+          `<label class="checkbox-item"><input type="checkbox" value="${escapeHtml(e.name || e)}" checked><span>${escapeHtml(e.name || e)}</span></label>`
+        ).join('');
+      } catch (err) {
+        document.getElementById('entityList').innerHTML = '<div style="color:var(--ink-subtle)">加载实体失败</div>';
+      }
+    }
+
+    document.getElementById('createBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('createBtn');
+      const err = document.getElementById('formError');
+      err.textContent = '';
+      btn.disabled = true; btn.textContent = '创建中...';
+      document.getElementById('loadingOverlay').classList.add('active');
+
+      const checked = Array.from(document.querySelectorAll('#entityList input:checked')).map(i => i.value);
+      const platform = document.querySelector('input[name="platform"]:checked').value;
+
+      try {
+        const createRes = await fetch(`${API}/api/simulation/create`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_id: projectId, graph_id: graphId, enable_twitter: platform === 'twitter' || platform === 'both', enable_reddit: platform === 'reddit' || platform === 'both' })
+        });
+        const createData = await createRes.json();
+        if (!createData.success) throw new Error(createData.error || '创建模拟失败');
+        const simId = createData.data.simulation_id;
+
+        const prepRes = await fetch(`${API}/api/simulation/prepare`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ simulation_id: simId, entity_types: checked, use_llm_for_profiles: true })
+        });
+        const prepData = await prepRes.json();
+        if (!prepData.success) throw new Error(prepData.error || '准备环境失败');
+
+        window.location.href = `sim-run.html?simulation_id=${simId}`;
+      } catch (e) {
+        err.textContent = e.message;
+        btn.disabled = false; btn.textContent = '创建模拟';
+        document.getElementById('loadingOverlay').classList.remove('active');
+      }
+    });
+
+    function showError(msg) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').textContent = msg;
+    }
+    function escapeHtml(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    init();
+  </script>
+</body>
+</html>

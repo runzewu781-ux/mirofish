@@ -1,0 +1,61 @@
+# ===========================================
+# MiroFish 项目 - Git 忽略规则
+# ===========================================
+
+# ---- 环境变量与敏感配置 ----
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ---- 虚拟环境 ----
+venv/
+.venv/
+env/
+ENV/
+
+# ---- IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- 上传文件与缓存 ----
+backend/uploads/
+backend/cache/
+backend/temp/
+backend/browser_data/
+*.log
+
+# ---- 前端构建产物 ----
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# ---- 操作系统 ----
+.DS_Store
+Thumbs.db

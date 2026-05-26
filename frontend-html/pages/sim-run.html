@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulation Run | POF</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .status-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-muted);
+      white-space: nowrap;
+    }
+    .status-label span {
+      color: var(--ink);
+      font-weight: 600;
+    }
+    .terminal {
+      background: var(--canvas);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .terminal-line {
+      color: var(--ink-muted);
+    }
+    .terminal-line .ts {
+      color: var(--ink-tertiary);
+      margin-right: 8px;
+    }
+    .terminal-line .agent {
+      color: var(--primary-hover);
+      font-weight: 600;
+    }
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 140px;
+      padding: 16px 0;
+    }
+    .chart-bar {
+      flex: 1;
+      background: var(--primary);
+      border-radius: var(--radius-xs) var(--radius-xs) 0 0;
+      opacity: 0.8;
+      min-width: 8px;
+    }
+    .chart-bar:hover {
+      opacity: 1;
+    }
+    .control-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--hairline);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>System</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>Dashboard</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>New Project</span></a>
+        <a href="history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>History</span></a>
+        <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">Simulation Run</div>
+      </header>
+      <div class="page-body">
+        <!-- Status Bar -->
+        <div class="status-bar">
+          <div class="status-label">Round <span>45</span> / 120</div>
+          <div class="progress-bar w-full">
+            <div class="progress-fill" style="width: 37.5%;"></div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs mb-4">
+          <button class="tab active">Running</button>
+          <button class="tab">Logs</button>
+          <button class="tab">Timeline</button>
+        </div>
+
+        <!-- Running Tab Content -->
+        <div class="grid grid-2 mb-4">
+          <!-- Agent Activity -->
+          <div class="card">
+            <h3 class="mb-4">Agent Activity</h3>
+            <div class="terminal">
+              <div class="terminal-line"><span class="ts">09:23:14</span><span class="agent">Agent_001</span> posted on Twitter</div>
+              <div class="terminal-line"><span class="ts">09:23:18</span><span class="agent">Agent_007</span> replied on Weibo</div>
+              <div class="terminal-line"><span class="ts">09:23:22</span><span class="agent">Agent_012</span> shared on Facebook</div>
+              <div class="terminal-line"><span class="ts">09:23:27</span><span class="agent">Agent_003</span> posted on Reddit</div>
+              <div class="terminal-line"><span class="ts">09:23:31</span><span class="agent">Agent_009</span> liked a post on Twitter</div>
+              <div class="terminal-line"><span class="ts">09:23:35</span><span class="agent">Agent_015</span> commented on YouTube</div>
+              <div class="terminal-line"><span class="ts">09:23:40</span><span class="agent">Agent_021</span> reposted on TikTok</div>
+              <div class="terminal-line"><span class="ts">09:23:44</span><span class="agent">Agent_005</span> posted on LinkedIn</div>
+            </div>
+          </div>
+
+          <!-- Sentiment Trend -->
+          <div class="card">
+            <h3 class="mb-4">Sentiment Trend</h3>
+            <div class="chart-bars">
+              <div class="chart-bar" style="height: 35%;"></div>
+              <div class="chart-bar" style="height: 48%;"></div>
+              <div class="chart-bar" style="height: 42%;"></div>
+              <div class="chart-bar" style="height: 60%;"></div>
+              <div class="chart-bar" style="height: 55%;"></div>
+              <div class="chart-bar" style="height: 72%;"></div>
+              <div class="chart-bar" style="height: 68%;"></div>
+              <div class="chart-bar" style="height: 80%;"></div>
+              <div class="chart-bar" style="height: 76%;"></div>
+              <div class="chart-bar" style="height: 85%;"></div>
+              <div class="chart-bar" style="height: 90%;"></div>
+              <div class="chart-bar" style="height: 88%;"></div>
+              <div class="chart-bar" style="height: 95%;"></div>
+              <div class="chart-bar" style="height: 92%;"></div>
+              <div class="chart-bar" style="height: 100%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Posts Table -->
+        <div class="card mb-4">
+          <h3 class="mb-4">Recent Posts</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Agent</th>
+                  <th>Platform</th>
+                  <th>Content</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Agent_001</td>
+                  <td>Twitter</td>
+                  <td>The new policy will bring significant changes to the industry landscape.</td>
+                  <td>09:23:14</td>
+                </tr>
+                <tr>
+                  <td>Agent_007</td>
+                  <td>Weibo</td>
+                  <td>Public opinion is shifting rapidly after the announcement.</td>
+                  <td>09:23:18</td>
+                </tr>
+                <tr>
+                  <td>Agent_012</td>
+                  <td>Facebook</td>
+                  <td>Experts predict mixed reactions in the coming weeks.</td>
+                  <td>09:23:22</td>
+                </tr>
+                <tr>
+                  <td>Agent_003</td>
+                  <td>Reddit</td>
+                  <td>This development could reshape the entire market dynamic.</td>
+                  <td>09:23:27</td>
+                </tr>
+                <tr>
+                  <td>Agent_009</td>
+                  <td>Twitter</td>
+                  <td>Early indicators suggest a positive sentiment trajectory.</td>
+                  <td>09:23:31</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="control-bar">
+          <button class="btn btn-secondary">Pause</button>
+          <button class="btn btn-ghost">Stop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

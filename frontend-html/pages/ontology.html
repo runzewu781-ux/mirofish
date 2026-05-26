@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ontology Result | Public Opinion Forecasting</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">POF <span>System</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="new-project.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span>New Project</span>
+        </a>
+        <a href="history.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>History</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">Ontology Result</div>
+      </header>
+      <div class="page-body">
+        <div class="card">
+          <h3 class="card-title">Analysis Summary</h3>
+          <p class="card-text">This project analyzes a university policy revision incident involving student organizations, administrative bodies, and media coverage to forecast public opinion trends and inform strategic response measures.</p>
+        </div>
+
+        <div class="panel-row">
+          <div class="panel">
+            <h4 class="panel-title">Entity Types</h4>
+            <ul class="type-list">
+              <li class="type-item">
+                <span class="type-badge entity">University</span>
+                <span class="type-desc">Academic institution affected by the policy</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge entity">Student</span>
+                <span class="type-desc">Individual student or student body</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge entity">MediaOutlet</span>
+                <span class="type-desc">News agency or online publisher</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge entity">Policy</span>
+                <span class="type-desc">Regulation or administrative rule</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge entity">Government</span>
+                <span class="type-desc">Local or national authority</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge entity">SocialPlatform</span>
+                <span class="type-desc">Online discussion or content platform</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="panel">
+            <h4 class="panel-title">Edge Types</h4>
+            <ul class="type-list">
+              <li class="type-item">
+                <span class="type-badge edge">AFFECTS</span>
+                <span class="type-desc">Direct impact relationship</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge edge">REPORTS_ON</span>
+                <span class="type-desc">Media coverage or commentary</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge edge">PARTICIPATES_IN</span>
+                <span class="type-desc">Involvement in an event or action</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge edge">OPPOSES</span>
+                <span class="type-desc">Negative stance or resistance</span>
+              </li>
+              <li class="type-item">
+                <span class="type-badge edge">SUPPORTS</span>
+                <span class="type-desc">Positive endorsement or backing</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="page-actions">
+          <a href="graph.html" class="btn btn-primary">Build Graph</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

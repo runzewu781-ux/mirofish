@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Graph Building | Public Opinion Forecasting</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">POF <span>System</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="new-project.html" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span>New Project</span>
+        </a>
+        <a href="history.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>History</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">Graph Building</div>
+      </header>
+      <div class="page-body">
+        <div class="progress-section">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 65%;"></div>
+          </div>
+          <div class="progress-label">65% — Extracting entities and relationships...</div>
+        </div>
+
+        <div class="step-indicator">
+          <div class="step">
+            <div class="step-circle">1</div>
+            <div class="step-label">Text Chunking</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step">
+            <div class="step-circle">2</div>
+            <div class="step-label">Create Graph</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step active">
+            <div class="step-circle">3</div>
+            <div class="step-label">Set Ontology</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step">
+            <div class="step-circle">4</div>
+            <div class="step-label">Add Texts</div>
+          </div>
+        </div>
+
+        <div class="terminal-log">
+          <div class="log-line"><span class="log-time">14:32:01</span> <span class="log-info">[INFO]</span> Loading text corpus: 1,247 articles</div>
+          <div class="log-line"><span class="log-time">14:32:04</span> <span class="log-info">[INFO]</span> Chunking strategy: semantic — max_tokens=512, overlap=64</div>
+          <div class="log-line"><span class="log-time">14:32:07</span> <span class="log-info">[INFO]</span> Chunking complete — 3,891 chunks generated</div>
+          <div class="log-line"><span class="log-time">14:32:08</span> <span class="log-info">[INFO]</span> Entity extraction model: gpt-4o-mini</div>
+          <div class="log-line"><span class="log-time">14:32:15</span> <span class="log-info">[INFO]</span> Extracted 842 entities, 1,203 relationships</div>
+          <div class="log-line"><span class="log-time">14:32:16</span> <span class="log-warn">[WARN]</span> 17 duplicate entities merged (University vs university)</div>
+          <div class="log-line"><span class="log-time">14:32:18</span> <span class="log-info">[INFO]</span> Applying ontology schema...</div>
+          <div class="log-line"><span class="log-time">14:32:20</span> <span class="log-info">[INFO]</span> Schema validation passed — 6 entity types, 5 edge types</div>
+          <div class="log-line"><span class="log-time">14:32:21</span> <span class="log-info">[INFO]</span> Inserting nodes and edges into graph store...</div>
+          <div class="log-line"><span class="log-time">14:32:24</span> <span class="log-info">[INFO]</span> Progress: 65% — batch 42/64 committed</div>
+        </div>
+
+        <div class="page-actions">
+          <button class="btn btn-secondary">View Graph Data</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

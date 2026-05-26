@@ -1,0 +1,24 @@
+# ===========================================
+# Render Blueprint —— 一键部署后端
+# 使用方式: Dashboard → Blueprints → New Blueprint Instance → 选择本仓库
+# ===========================================
+
+services:
+  - type: web
+    name: mirofish-backend
+    runtime: python
+    plan: free
+    branch: main
+    # 构建命令：安装依赖
+    buildCommand: cd backend && pip install -r requirements.txt
+    # 启动命令：使用 Gunicorn 运行 WSGI 应用
+    startCommand: cd backend && gunicorn wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+      # ⚠️ 以下敏感变量请在 Render Dashboard 手动添加，不要写在代码里：
+      # - DEEPSEEK_API_KEY
+      # - ZEP_API_KEY
+      # - ZEP_BASE_URL（可选，如果使用 Zep Cloud 可不填）

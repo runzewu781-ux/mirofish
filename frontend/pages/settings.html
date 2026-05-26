@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>系统设置 | 舆情预测</title>
+  <script src="../js/api-config.js"></script>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .hint-box { background: var(--surface-2); border-radius: var(--radius-md); padding: 12px 16px; font-size: 13px; color: var(--ink-muted); margin-bottom: 20px; line-height: 1.6; }
+    .hint-box code { background: var(--surface-3); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    .form-input[readonly] { background: var(--surface-2); color: var(--ink-tertiary); cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header"><div class="sidebar-logo">POF <span>System</span></div></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg><span>仪表盘</span></a>
+        <a href="new-project.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>新建项目</span></a>
+        <a href="history.html" class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>历史项目</span></a>
+        <a href="settings.html" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>设置</span></a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar"><div class="topbar-title">系统设置</div></header>
+      <div class="page-body">
+        <div style="max-width:640px">
+          <div class="hint-box">
+            配置保存在后端 <code>.env</code> 文件中。当前页面仅作查看，如需修改请直接编辑 <code>public-opinion-forecast/.env</code> 后重启后端服务。
+          </div>
+
+          <div class="card mb-4">
+            <h2 style="font-size:18px;margin-bottom:20px">大语言模型配置</h2>
+            <div class="form-group">
+              <label class="form-label">API Key</label>
+              <input type="password" class="form-input" value="••••••••" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Base URL</label>
+              <input type="text" class="form-input" value="https://api.deepseek.com/v1" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">模型名称</label>
+              <input type="text" class="form-input" value="deepseek-chat" readonly>
+            </div>
+          </div>
+
+          <div class="card mb-4">
+            <h2 style="font-size:18px;margin-bottom:20px">Zep Cloud</h2>
+            <div class="form-group">
+              <label class="form-label">API Key</label>
+              <input type="password" class="form-input" value="••••••••" readonly>
+            </div>
+          </div>
+
+          <div class="card mb-4">
+            <h2 style="font-size:18px;margin-bottom:20px">连接测试</h2>
+            <div class="flex gap-3">
+              <button class="btn btn-primary" id="testLLM">测试 LLM</button>
+              <button class="btn btn-secondary" id="testZep">测试 Zep</button>
+            </div>
+            <div id="testResult" style="margin-top:12px;font-size:13px;color:var(--ink-muted)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.API_BASE || 'http://127.0.0.1:5001';
+    const result = document.getElementById('testResult');
+
+    document.getElementById('testLLM').addEventListener('click', async () => {
+      result.textContent = '测试中...';
+      try {
+        const res = await fetch(`${API}/health`);
+        const data = await res.json();
+        result.innerHTML = `<span style="color:var(--success)">✓ 后端在线: ${data.service}</span>`;
+      } catch (err) {
+        result.innerHTML = `<span style="color:var(--error)">✗ 连接失败: ${err.message}</span>`;
+      }
+    });
+
+    document.getElementById('testZep').addEventListener('click', async () => {
+      result.textContent = '测试中...';
+      try {
+        const res = await fetch(`${API}/api/graph/project/list`);
+        const data = await res.json();
+        if (data.success) {
+          result.innerHTML = `<span style="color:var(--success)">✓ Zep 可用，项目列表正常</span>`;
+        } else {
+          result.innerHTML = `<span style="color:var(--error)">✗ Zep 异常: ${data.error || '未知错误'}</span>`;
+        }
+      } catch (err) {
+        result.innerHTML = `<span style="color:var(--error)">✗ 连接失败: ${err.message}</span>`;
+      }
+    });
+  </script>
+</body>
+</html>

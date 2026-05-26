@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agent Interaction | POF</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">POF <span>System</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="new-project.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          <span>New Project</span>
+        </a>
+        <a href="history.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <span>History</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.17 15a1.65 1.65 0 0 0-1.51-1H2a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.11 9.5a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 8.5 4.89a1.65 1.65 0 0 0 1-1.51V2a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-title">Agent Interaction</div>
+      </header>
+      <div class="page-body">
+        <div style="display:flex;gap:24px;height:calc(100vh - 120px)">
+          <!-- Agent List -->
+          <div class="card" style="width:260px;flex-shrink:0;padding:16px">
+            <h3 style="font-size:14px;margin-bottom:16px;color:var(--ink-muted)">Agents</h3>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-md);background:var(--surface-2);cursor:pointer">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">S1</div>
+                <div>
+                  <div style="font-size:13px;font-weight:500">Student_001</div>
+                  <div style="font-size:11px;color:var(--ink-subtle)">Freshman, active on social</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-md);cursor:pointer">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">J1</div>
+                <div>
+                  <div style="font-size:13px;font-weight:500">Journalist_01</div>
+                  <div style="font-size:11px;color:var(--ink-subtle)">Education beat reporter</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-md);cursor:pointer">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">A1</div>
+                <div>
+                  <div style="font-size:13px;font-weight:500">Admin_001</div>
+                  <div style="font-size:11px;color:var(--ink-subtle)">University spokesperson</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-md);cursor:pointer">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">P1</div>
+                <div>
+                  <div style="font-size:13px;font-weight:500">Parent_001</div>
+                  <div style="font-size:11px;color:var(--ink-subtle)">Concerned parent</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Chat Area -->
+          <div class="card" style="flex:1;display:flex;flex-direction:column;padding:0;overflow:hidden">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--hairline)">
+              <div style="font-weight:600">Student_001</div>
+              <div style="font-size:12px;color:var(--ink-subtle)">Freshman, active on social media, critical of new policy</div>
+            </div>
+            <div style="flex:1;padding:20px;overflow-y:auto;background:var(--canvas)">
+              <div class="chat-msg chat-agent">Hi! I'm a freshman here. I heard about the new policy and honestly I'm worried it might affect our daily life too much.</div>
+              <div class="chat-msg chat-user">What do you think will happen if the school strictly enforces this policy?</div>
+              <div class="chat-msg chat-agent">I think there will be a lot of resistance at first. Students might organize petitions or express their dissatisfaction online. But eventually, people will adapt.</div>
+              <div class="chat-msg chat-user">Would you participate in any protest?</div>
+              <div class="chat-msg chat-agent">Probably not a physical protest, but I would definitely share my opinions on social media and sign online petitions.</div>
+            </div>
+            <div style="padding:16px 20px;border-top:1px solid var(--hairline);display:flex;gap:12px">
+              <input type="text" class="form-input" placeholder="Ask this agent...">
+              <button class="btn btn-primary" style="flex-shrink:0">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
