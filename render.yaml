@@ -19,6 +19,9 @@ services:
       - key: FLASK_ENV
         value: production
       # ⚠️ 以下敏感变量请在 Render Dashboard 手动添加，不要写在代码里：
-      # - DEEPSEEK_API_KEY
+      # - LLM_API_KEY        (DeepSeek key: sk-xxx)
+      # - LLM_BASE_URL       (DeepSeek: https://api.deepseek.com/v1)
+      # - LLM_MODEL_NAME     (DeepSeek: deepseek-chat)
       # - ZEP_API_KEY
-      # - ZEP_BASE_URL（可选，如果使用 Zep Cloud 可不填）
+      # - SECRET_KEY         (随机字符串，用于 Flask session)
+      # - FLASK_DEBUG        (生产环境设为 False)
